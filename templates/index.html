@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!-- La línea de arriba le dice al navegador: "esto es HTML moderno". -->
+<html lang="es">
+<head>
+  <!-- ========== CONFIGURACIÓN (no se ve en la página) ========== -->
+  <meta charset="UTF-8">                                                  <!-- para que se vean bien las tildes y la ñ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- para que se adapte a celulares -->
+  <title>AeroLista ✈ Vuelo {{ vuelo.codigo }}</title>                     <!-- texto de la pestaña; Jinja pone "AL-204" -->
+  <!-- El iconito de la pestaña: un avión dibujado con SVG (así no hace falta una imagen) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
+
+  <!-- Dos tipos de letra de Google: Inter (textos) y Fira Code (números de asiento) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Nuestra hoja de estilos (la creamos en el paso 6).
+       url_for('static', filename=...) arma la dirección correcta hacia la carpeta static/ -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+
+  <!-- ========== 1. ENCABEZADO: marca, ruta del vuelo y datos ========== -->
+  <header class="barra">
+    <div class="marca">
+      <span class="marca-logo">✈</span>
+      <div><b>AeroLista</b><small>Reservas con listas enlazadas</small></div>
+    </div>
+    <div class="ruta">
+      <!-- {{ vuelo.codigo_origen }} se reemplaza por "GYE" (viene de vuelo.py) -->
+      <div class="ruta-punto"><b>{{ vuelo.codigo_origen }}</b><small>{{ vuelo.origen }}</small></div>
+      <div class="ruta-linea"><span>✈</span></div>
+      <div class="ruta-punto"><b>{{ vuelo.codigo_destino }}</b><small>{{ vuelo.destino }}</small></div>
+    </div>
+    <div class="vuelo-datos">
+      <span>Vuelo <b>{{ vuelo.codigo }}</b></span>
+      <span>📅 {{ vuelo.fecha }}</span>
+      <span>🕖 {{ vuelo.hora }}</span>
+    </div>
+  </header>
+
+  <!-- ========== 2. CONTENIDO: el avión (izquierda) y el panel (derecha) ========== -->
+  <main class="contenedor">
+    <section class="zona-avion">
+            <!-- Tablero: 4 tarjetas con los números del vuelo -->
+      <div class="tablero">
+        <div class="dato"><small>Reservados</small><b id="dato-reservados">—</b></div>
+        <div class="dato"><small>Libres</small><b id="dato-libres">—</b></div>
+        <div class="dato"><small>Asientos</small><b id="dato-total">—</b></div>
+        <div class="dato">
+          <small>Ocupación</small>
+          <div class="ocupacion"><span class="luz" id="luz-ocupacion"></span><b id="dato-ocupacion">—</b></div>
+          <div class="barra-ocupacion"><span id="barra-ocupacion"></span></div>   <!-- barrita de progreso -->
+        </div>
+      </div>
+      <p class="aviso-pendiente" id="aviso-tablero" hidden></p>
+
+      <!-- Leyenda del semáforo y botones para elegir la vista -->
+      <div class="controles">
+        <ul class="leyenda">
+          <li><span class="muestra libre"></span>Libre</li>
+          <li><span class="muestra seleccionado"></span>Seleccionado</li>
+          <li><span class="muestra ocupado"></span>Reservado</li>
+          <li><span class="muestra encontrado"></span>Encontrado</li>
+        </ul>
+        <div class="vistas">
+          <!-- data-vista guarda qué vista activa cada botón -->
+          <button type="button" class="btn-vista activo" data-vista="3d">🧊 3D</button>
+          <button type="button" class="btn-vista" data-vista="2d">🗺️ 2D</button>
+        </div>
+      </div>
+      <!-- Deslizadores (input type="range"): solo se ven en 3D -->
+      <div class="ajustes-3d" id="ajustes-3d">
+        <label>Inclinación <input type="range" id="rango-inclinacion" min="0" max="65" value="42"></label>
+        <label>Giro <input type="range" id="rango-giro" min="-180" max="180" value="0"></label>
+      </div>
+      <!-- Aviso que usaremos en la Etapa E si Python no puede listar las reservas -->
+      <p class="aviso-pendiente" id="aviso-avion" hidden></p>
+
+      <!-- LA ESCENA: el "cielo" donde flota el avión -->
+      <div class="escena" id="escena">
+        <div class="avion vista-3d" id="avion">
+          <div class="sombra"></div>                 <!-- sombra en el suelo (se ve en 3D) -->
+          <div class="ala ala-izq"></div>            <!-- alas: rectángulos recortados -->
+          <div class="ala ala-der"></div>
+          <div class="motor motor-izq"></div>        <!-- motores debajo de las alas -->
+          <div class="motor motor-der"></div>
+          <div class="timon timon-izq"></div>        <!-- alas pequeñas de la cola -->
+          <div class="timon timon-der"></div>
+          <div class="fuselaje">                     <!-- el cuerpo del avión -->
+            <div class="nariz">
+              <div class="parabrisas"><span></span><span></span></div>   <!-- ventanas del piloto -->
+            </div>
+            <div class="cabina" id="cabina">
+              <!-- VACÍA: app.js crea aquí las 12 filas y los 68 asientos (paso 12) -->
+            </div>
+            <div class="cola"><span>AL</span></div>   <!-- la cola, con la marca -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <p class="pronto">📌 PASO 18 · aquí irá el panel de operaciones</p>
+  </main>
+
+  <!-- ========== 3. EL TREN: la lista enlazada dibujada ========== -->
+  <p class="pronto">📌 PASO 24 · aquí irá el tren de la lista enlazada</p>
+
+  <!-- ========== 4. PIE DE PÁGINA ========== -->
+  <footer class="pie" id="pie">AeroLista · Proyecto de Estructuras de Datos · Flask + listas enlazadas</footer>
+
+  <!-- ========== 5. ELEMENTOS FLOTANTES ========== -->
+  <div class="toasts" id="toasts"></div>   <!-- aquí aparecen los mensajes flotantes -->
+  <div class="tooltip" id="tooltip" hidden></div>   <!-- el globo de ayuda (empieza escondido) -->
+
+  <!-- ========== 6. SCRIPTS (el orden importa: se cargan de arriba hacia abajo) ========== -->
+  <script src="{{ url_for('static', filename='js/utilidades.js') }}"></script>  <!-- atajos: $, crear... -->
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>         <!-- hablar con Flask -->
+  <script src="{{ url_for('static', filename='js/mensajes.js') }}"></script>    <!-- toasts y avisos -->
+  <script src="{{ url_for('static', filename='js/avion.js') }}"></script>       <!-- dibuja filas y asientos -->
+  <script src="{{ url_for('static', filename='js/clic.js') }}"></script>        <!-- clic en un asiento -->
+  <script src="{{ url_for('static', filename='js/vista3d.js') }}"></script>     <!-- vista 3D -->
+  <script src="{{ url_for('static', filename='js/datos-demo.js') }}"></script>  <!-- 🎭 datos de prueba (se quita en el paso 29) -->
+  <script src="{{ url_for('static', filename='js/semaforo.js') }}"></script>    <!-- 🚦 colores de los asientos -->
+  <script src="{{ url_for('static', filename='js/tooltip.js') }}"></script> 
+  <script src="{{ url_for('static', filename='js/tablero.js') }}"></script>     <!-- números del vuelo -->
+    <!-- globo de ayuda -->
+  <!-- 📌 SCRIPTS · cada paso agrega su archivo .js ENCIMA de esta línea -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>   <!-- lo creamos en el paso 7 -->
+</body>
+</html>
